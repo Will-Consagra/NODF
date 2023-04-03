@@ -1,0 +1,33 @@
+README
+
+v1.1 (27.10.2017) Original version
+
+This is a matlab implementation of basic operations on the Riemannian manifold of Gaussian distributions under the Wasserstein metric, also including how to compute barycenters, used in 
+
+[1] A. Mallasto, A. Feragen, Learning from uncertain curves: The 2-Wasserstein metric for Gaussian processes, accepted for NIPS 2017.
+
+CONTENTS
+
+Matlab functions:
+
+
+example.m (Contains an example how to use the functions in the library.)
+Wbarycenter.m (Computes the barycenters of Gaussian distributions under the 2-Wasserstein metric.)
+W.m (Computes the 2-Wasserstein distance between two GDs).
+plotGP.m (Visualize a Gaussian process).
+visualizePopulation.m (Plot multiple Gaussian processes).
+
+expmap.m (The exponential map on the Riemannian manifold of GDs).
+logmap.m (The logarithmic map on the Riemannian manifold of GDs).
+transportMap.m (The optimal transport map (Monge) between two GDs).
+
+Data:
+exampleData.mat (contains Gaussian processes fitted to data obtained from
+
+[2]O. Bulygina and V. Razuvaev. Daily temperature and precipitation data for 518 russian meteorologicalstations. Carbon Dioxide Information Analysis Center, Oak Ridge National Laboratory, US Department ofEnergy, Oak Ridge, Tennessee, 2012.
+
+[3]R. Tatusko and J. A. Mirabito. Cooperation in climate research: An evaluation of the activities conductedunder the US-USSR agreement for environmental protection since 1974. National Climate Program Office,1990.
+
+CONTACT
+
+Any questions can be directed to Anton Mallasto: mallasto@di.ku.dk.
