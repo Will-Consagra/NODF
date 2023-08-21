@@ -98,10 +98,13 @@ def get_gp_posterior_utility(device, field_model, dataloader, hyper_params):
 
 def post_calibration(device, field_model, dataloader_calib, hyper_params, var_grid):
 	llk = np.zeros(len(var_grid))
-	coordmap_calib, data_calib = dataloader_calib.dataset.getfulldata()
+
+	coordmap_calib =  dataloader_calib.dataset.X.to(device)
+	data_calib_yvals = dataloader_calib.dataset.Y.to(device)
+
 	Phi_tensor = hyper_params["Phi_tensor"]
 	K = Phi_tensor.shape[1]
-	model_output_calib = field_model(coordmap_calib["coords"].to(device))
+	model_output_calib = field_model(coordmap_calib)
 	C_mu_tensor_calib = model_output_calib["model_out"][:,0:1]
 
 	for i, svar in enumerate(var_grid):
@@ -109,7 +112,7 @@ def post_calibration(device, field_model, dataloader_calib, hyper_params, var_gr
 		hyper_params_i = copy.deepcopy(hyper_params)
 		hyper_params_i["sigma2_w"] = sigma2_w
 		posterior_field = get_gp_posterior_utility(device, field_model, dataloader_calib, hyper_params_i)
-		Post_mean_c, Post_cov_c = posterior_field.compute_predictive_posterior(device, coordmap_calib["coords"].to(device))
+		Post_mean_c, Post_cov_c = posterior_field.compute_predictive_posterior(coordmap_calib)
 		Post_mean_coefs = torch.column_stack((C_mu_tensor_calib,
 												Post_mean_c))
 
@@ -123,7 +126,7 @@ def post_calibration(device, field_model, dataloader_calib, hyper_params, var_gr
 		Y_pred_mean = Post_mean_coefs @ Phi_tensor.T
 		Y_pred_cov = Phi_tensor @ Post_cov_mats @ Phi_tensor.T + hyper_params_i["sigma2_e"]*I_N
 		mvn = MultivariateNormal(Y_pred_mean, Y_pred_cov)
-		llk[i] = float(mvn.log_prob(data_calib["yvals"].to(device)).sum().cpu().detach().numpy())
+		llk[i] = float(mvn.log_prob(data_calib_yvals).sum().cpu().detach().numpy())
 
 	sigma2_mu_optim, sigma2_w_optim = var_grid[np.argmax(llk)]
 	return sigma2_mu_optim, sigma2_w_optim
