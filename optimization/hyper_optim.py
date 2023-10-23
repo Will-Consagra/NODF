@@ -12,12 +12,10 @@ def _evaluate(device, parameterization, hyper_params, field_model_, optimizer_, 
 		field_model = field_model_(hidden_features=parameterization["r"]).to(device) 
 	else:
 		field_model = field_model_().to(device) 
-
 	if "learning_rate" in parameterization:
 		optim = optimizer_(params=field_model.parameters(), lr=parameterization["learning_rate"])
 	else:
 		optim = optimizer_(params=field_model.parameters())
-
 	if "nu" in parameterization:
 		eigs_root = hyper_params["eigs_root"]
 		rho = hyper_params["rho"]
@@ -26,7 +24,6 @@ def _evaluate(device, parameterization, hyper_params, field_model_, optimizer_, 
 		hyper_params["R_tensor"] = R_tensor
 	else:
 		R_tensor = hyper_params["R_tensor"]
-		
 	hyper_params["lambda_c"] = parameterization["lambda_c"]	
 	## estimate parameters 
 	algorithm(device,
@@ -38,8 +35,8 @@ def _evaluate(device, parameterization, hyper_params, field_model_, optimizer_, 
 				verbose=False)
 	## get mode predictions at test locations 
 	Phi_tensor = hyper_params["Phi_tensor"]
-	coords_test = dataloader.dataset.X.to(device)
-	Y_tensor_test = dataloader.dataset.Y.T.to(device)
+	coords_test = dataloader_test.dataset.X.to(device)
+	Y_tensor_test = dataloader_test.dataset.Y.T.to(device)
 	C_hat_test = field_model(coords_test)["model_out"]
 	return float(((Y_tensor_test - Phi_tensor @ C_hat_test.T)**2).sum().cpu().detach().numpy())
 
@@ -53,7 +50,6 @@ def BO_optimization(device, Obs, field_model_, optimizer_, algorithm, hyper_para
 									parameters=parameter_map,
 									minimize=True, 
 									)
-
 	for _ in range(Nexperiments):
 		parameters, trial_index = map_ax_client.get_next_trial()
 		if "num_epochs" in parameters:

@@ -25,6 +25,5 @@ def integrated_roughness(coords, chat, R_tensor, lambda_c):
 	R_tensor: Kprime x Kprime (diagonal) prior precision matrix of functions
 	lambda_c: (float) 
 	"""
-	#energy = (lambda_c/chat.shape[1])*torch.sum((chat**2) * torch.diag(R_tensor)) 
 	energy = lambda_c*torch.mean((chat**2) * torch.diag(R_tensor))
 	return energy

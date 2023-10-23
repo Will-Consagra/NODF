@@ -7,8 +7,8 @@ from utility.utility import verbosity
 from tqdm.autonotebook import tqdm
 import time 
 
-##defining optimization routine 
-def MAP(device, field_model, optim, hyper_params, dataloader, num_epochs, verbose=False):
+## penalized maximum likelihood estimation for deep basis parameters
+def PMLE(device, field_model, optim, hyper_params, dataloader, num_epochs, verbose=False):
 	"""
 	field_model - nn.Module: Defines the coordindate functions of the coefficient field 
 	optim - torch.optim: Optimizer 
@@ -32,7 +32,7 @@ def MAP(device, field_model, optim, hyper_params, dataloader, num_epochs, verbos
 	R_tensor = hyper_params["R_tensor"]
 	lambda_c = hyper_params["lambda_c"]
 
-	def neg_MAP_loss(coords, chat, obs_data):
+	def neg_pmle(coords, chat, obs_data):
 		l2_loss = neg_log_likelihood(chat, obs_data, Phi_tensor)
 		prior_energy = integrated_roughness(coords, chat, R_tensor, lambda_c)
 		return {"l2_loss":l2_loss, "prior_energy":prior_energy}
@@ -50,7 +50,7 @@ def MAP(device, field_model, optim, hyper_params, dataloader, num_epochs, verbos
 				model_output = field_model(model_input["coords"])
 				coords = model_output["model_in"]
 				chat = model_output["model_out"] 
-				losses = neg_MAP_loss(coords, chat, data)
+				losses = neg_pmle(coords, chat, data)
 				train_loss = 0.
 				for loss_name, loss in losses.items():
 					single_loss = loss.mean()
